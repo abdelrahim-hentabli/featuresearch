@@ -7,7 +7,7 @@
 #include <time.h>
 #include <math.h>
 #include <cstring>
-
+#include <ctime>
 
 float accuracy_add(const std::vector<std::vector<float>> &data, const std::set<int> &current_set, int feature_to_add){
   double running_total;
@@ -150,7 +150,7 @@ void forward_search_demo(const std::vector<std::vector<float>>& data){
       }
     }
     current_set.insert(feature_to_add); 
-    std::cout<<"On level "<<i<<" I added feature "<<feature_to_add<<"\n\n";
+    std::cout<<"On level "<<i<<" I added feature "<<feature_to_add<<" with accuracy of "<<max_accuracy<<"\n\n";
     if(max_accuracy > best_accuracy){
       best_accuracy = max_accuracy;
       max_set = current_set;
@@ -197,6 +197,7 @@ void backward_search_demo(const std::vector<std::vector<float>>& data){
       }  
     }
     current_set.erase(feature_to_remove);
+    std::cout<<"On level "<<i<<" I removed feature "<<feature_to_remove<<" with accuracy of "<<max_accuracy<<"\n\n";
     if(max_accuracy > best_accuracy){
       accuracy_declining = false;
       best_accuracy = max_accuracy;
@@ -208,7 +209,6 @@ void backward_search_demo(const std::vector<std::vector<float>>& data){
     else{
       accuracy_declining = true;
     }
-    std::cout<<"On level "<<i<<" I removed feature "<<feature_to_remove<<"\n\n";
   }
   std::cout<<"Best accuracy was on set {";
   for(auto it = max_set.begin(); it != max_set.end(); it++){
@@ -243,7 +243,7 @@ void faster_search_demo(const std::vector<std::vector<float>>& data){
         }
       }
     }
-    std::cout<<"On level "<<i<<" I added feature "<<feature_to_add<<"\n\n";
+    std::cout<<"On level "<<i<<" I added feature "<<feature_to_add<<" with accuracy of "<<max_accuracy<<"\n\n";
     current_set.insert(feature_to_add);
     if(max_accuracy > best_accuracy){
       best_accuracy = max_accuracy;
@@ -326,6 +326,7 @@ std::vector<std::vector<float>> parseFile(std::istream &in){
 int main(int argc, char** argv){ 
   bool backward = false;
   std::ifstream file;
+  std::clock_t start;
   if(argc < 5 || (std::strcmp(argv[1], "-t") != 0 && (std::strcmp(argv[1], "-f") != 0) || (std::strcmp(argv[3], "-t") != 0 && (std::strcmp(argv[3], "-f") != 0)))){
     std::cout<<"Usage: ./featuresearch -t <forward/backward> -f <filename>\n";
     return 0;
@@ -339,17 +340,16 @@ int main(int argc, char** argv){
       backward = std::strcmp(argv[4], "backward") == 0?true:false;
       file.open(argv[2]);
     }
-    time_t start = time(NULL);
-    std::vector<std::vector<float>> data = parseFile(file); 
-    for(int i = 0; i < data.size(); i++){
-      for(int j = 0; j < data[i].size(); j++){
-        std::cout<<data[i][j]<<' ';
-      }
-      std::cout<<'\n';
-    }    
+    start = std::clock();
+    std::vector<std::vector<float>> data = parseFile(file);   
     srand(time(NULL));
-    forward_search_demo(data);
-    std::cout<<"Program took "<<time(NULL) - start<<" seconds to complete.\n";
+    if(backward){
+      backward_search_demo(data);
+    }
+    else{
+      forward_search_demo(data);
+    }
+    std::cout<<"Program took "<<(std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000)<<" milliseconds to complete.\n";
     return 0;
   }
 }
