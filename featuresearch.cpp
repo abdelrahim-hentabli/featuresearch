@@ -1,9 +1,13 @@
 #include <iostream>
+#include <fstream>
+#include <string>
 #include <vector>
 #include <set>
 #include <sstream>
 #include <time.h>
 #include <math.h>
+#include <cstring>
+
 
 float accuracy_add(const std::vector<std::vector<float>> &data, const std::set<int> &current_set, int feature_to_add){
   double running_total;
@@ -130,6 +134,7 @@ void forward_search_demo(const std::vector<std::vector<float>>& data){
   std::set<int> current_set;
   float max_accuracy = 0.0;
   int feature_to_add;
+  bool accuracy_declining = false;
   for(int i = 1; i < data[0].size(); i++){
     max_accuracy = 0;
     std::cout<<"On the "<<i<<"th level of the search tree\n";
@@ -149,6 +154,13 @@ void forward_search_demo(const std::vector<std::vector<float>>& data){
     if(max_accuracy > best_accuracy){
       best_accuracy = max_accuracy;
       max_set = current_set;
+      accuracy_declining = false;
+    }
+    else if(accuracy_declining){
+      break;
+    }
+    else{
+      accuracy_declining = true;
     }
   }
   std::cout<<"Best accuracy was on set {";
@@ -171,6 +183,7 @@ void backward_search_demo(const std::vector<std::vector<float>>& data){
   }
   float max_accuracy = 0;
   int feature_to_remove;
+  bool accuracy_declining = false;
   for(int i = 1; i < data[0].size();i++) {
     max_accuracy = 0;
     std::cout<<"On the "<<i<<"th level of the search tree\n";
@@ -185,8 +198,15 @@ void backward_search_demo(const std::vector<std::vector<float>>& data){
     }
     current_set.erase(feature_to_remove);
     if(max_accuracy > best_accuracy){
+      accuracy_declining = false;
       best_accuracy = max_accuracy;
       max_set = current_set;
+    }
+    else if(accuracy_declining){
+      break;
+    }
+    else{
+      accuracy_declining = true;
     }
     std::cout<<"On level "<<i<<" I removed feature "<<feature_to_remove<<"\n\n";
   }
@@ -208,6 +228,7 @@ void faster_search_demo(const std::vector<std::vector<float>>& data){
   std::set<int> current_set;
   float max_accuracy = 0.0;
   int feature_to_add;
+  bool accuracy_declining = false;
   for(int i = 1; i < data[0].size(); i++){
     max_accuracy = 0;
     std::cout<<"On the "<<i<<"th level of the search tree\n";
@@ -227,6 +248,12 @@ void faster_search_demo(const std::vector<std::vector<float>>& data){
     if(max_accuracy > best_accuracy){
       best_accuracy = max_accuracy;
       max_set = current_set;
+    }
+    else if(accuracy_declining){
+      break;
+    }
+    else{
+      accuracy_declining = true;
     }
   }
   std::cout<<"Best accuracy was on set {";
@@ -280,12 +307,12 @@ void greedy_search_demo(const std::vector<std::vector<float>>& data){
   std::cout<<"} with accuracy "<<best_accuracy<<'\n';
 }
 
-std::vector<std::vector<float>> parseFile(){
+std::vector<std::vector<float>> parseFile(std::istream &in){
   std::vector<std::vector<float>> output;
   std::string line;
   float number;
   std::vector <float> lineVector;
-  while(getline(std::cin, line)){
+  while(getline(in, line)){
     std::istringstream temp(line);
     lineVector.clear();
     while(temp>>number){
@@ -296,10 +323,33 @@ std::vector<std::vector<float>> parseFile(){
   return output;
 }
 
-int main(){ 
-  time_t start = time(NULL);
-  std::vector<std::vector<float>> data = parseFile();  
-  srand(time(NULL));
-  greedy_search_demo(data);
-  std::cout<<"Program took "<<time(NULL) - start<<" seconds to complete.\n";
+int main(int argc, char** argv){ 
+  bool backward = false;
+  std::ifstream file;
+  if(argc < 5 || (std::strcmp(argv[1], "-t") != 0 && (std::strcmp(argv[1], "-f") != 0) || (std::strcmp(argv[3], "-t") != 0 && (std::strcmp(argv[3], "-f") != 0)))){
+    std::cout<<"Usage: ./featuresearch -t <forward/backward> -f <filename>\n";
+    return 0;
+  }
+  else{
+    if(std::strcmp(argv[1], "-t") == 0){
+      backward = std::strcmp(argv[2], "backward") == 0?true:false;
+      file.open(argv[4]);
+    }
+    else{
+      backward = std::strcmp(argv[4], "backward") == 0?true:false;
+      file.open(argv[2]);
+    }
+    time_t start = time(NULL);
+    std::vector<std::vector<float>> data = parseFile(file); 
+    for(int i = 0; i < data.size(); i++){
+      for(int j = 0; j < data[i].size(); j++){
+        std::cout<<data[i][j]<<' ';
+      }
+      std::cout<<'\n';
+    }    
+    srand(time(NULL));
+    forward_search_demo(data);
+    std::cout<<"Program took "<<time(NULL) - start<<" seconds to complete.\n";
+    return 0;
+  }
 }
