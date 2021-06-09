@@ -307,16 +307,20 @@ void greedy_search_demo(const std::vector<std::vector<float>>& data){
   std::cout<<"} with accuracy "<<best_accuracy<<'\n';
 }
 
-std::vector<std::vector<float>> parseFile(std::istream &in){
+std::vector<std::vector<float>> parseFile(std::istream &in, bool comma = false){
   std::vector<std::vector<float>> output;
   std::string line;
   float number;
+  char c;
   std::vector <float> lineVector;
   while(getline(in, line)){
     std::istringstream temp(line);
     lineVector.clear();
     while(temp>>number){
       lineVector.push_back(number);
+      if(temp && comma){
+        temp>>c;
+      }
     }
     output.push_back(lineVector);
   }
@@ -327,6 +331,7 @@ int main(int argc, char** argv){
   bool backward = false;
   std::ifstream file;
   std::clock_t start;
+  bool comma = false;
   if(argc < 5 || (std::strcmp(argv[1], "-t") != 0 && (std::strcmp(argv[1], "-f") != 0) || (std::strcmp(argv[3], "-t") != 0 && (std::strcmp(argv[3], "-f") != 0)))){
     std::cout<<"Usage: ./featuresearch -t <forward/backward> -f <filename>\n";
     return 0;
@@ -340,8 +345,17 @@ int main(int argc, char** argv){
       backward = std::strcmp(argv[4], "backward") == 0?true:false;
       file.open(argv[2]);
     }
+    if(argc > 5 && std::strcmp(argv[5], "-c") == 0){
+      comma = true;
+    }
     start = std::clock();
-    std::vector<std::vector<float>> data = parseFile(file);   
+    std::vector<std::vector<float>> data = parseFile(file, comma);
+    for(int i = 0; i < data.size(); i++){
+      for(int j = 0; j < data[i].size(); j++){
+        std::cout<<data[i][j]<<"  ";
+      }
+      std::cout<<'\n';
+    }   
     srand(time(NULL));
     if(backward){
       backward_search_demo(data);
