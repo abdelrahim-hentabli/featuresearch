@@ -10,4 +10,4 @@ To compile run command \
 
 To run program use command \
 
-`./featuresearch -t <forward/backward> -f <filename>`
+`./featuresearch -t <forward/backward> -f <filename> <-c if comma seperated data file like iris.txt>`
