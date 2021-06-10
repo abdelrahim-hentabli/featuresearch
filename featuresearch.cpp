@@ -350,12 +350,12 @@ int main(int argc, char** argv){
     }
     start = std::clock();
     std::vector<std::vector<float>> data = parseFile(file, comma);
-    for(int i = 0; i < data.size(); i++){
-      for(int j = 0; j < data[i].size(); j++){
-        std::cout<<data[i][j]<<"  ";
-      }
-      std::cout<<'\n';
-    }   
+    // for(int i = 0; i < data.size(); i++){
+    //   for(int j = 0; j < data[i].size(); j++){
+    //     std::cout<<data[i][j]<<"  ";
+    //   }
+    //   std::cout<<'\n';
+    // }   
     srand(time(NULL));
     if(backward){
       backward_search_demo(data);
