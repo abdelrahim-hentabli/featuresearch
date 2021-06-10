@@ -134,7 +134,7 @@ void forward_search_demo(const std::vector<std::vector<float>>& data){
   std::set<int> current_set;
   float max_accuracy = 0.0;
   int feature_to_add;
-  bool accuracy_declining = false;
+  //bool accuracy_declining = false;
   for(int i = 1; i < data[0].size(); i++){
     max_accuracy = 0;
     std::cout<<"On the "<<i<<"th level of the search tree\n";
@@ -154,14 +154,14 @@ void forward_search_demo(const std::vector<std::vector<float>>& data){
     if(max_accuracy > best_accuracy){
       best_accuracy = max_accuracy;
       max_set = current_set;
-      accuracy_declining = false;
+      // accuracy_declining = false;
     }
-    else if(accuracy_declining){
-      break;
-    }
-    else{
-      accuracy_declining = true;
-    }
+    // else if(accuracy_declining){
+    //   break;
+    // }
+    // else{
+    //   accuracy_declining = true;
+    // }
   }
   std::cout<<"Best accuracy was on set {";
   for(auto it = max_set.begin(); it != max_set.end(); it++){
@@ -183,7 +183,7 @@ void backward_search_demo(const std::vector<std::vector<float>>& data){
   }
   float max_accuracy = 0;
   int feature_to_remove;
-  bool accuracy_declining = false;
+  // bool accuracy_declining = false;
   for(int i = 1; i < data[0].size();i++) {
     max_accuracy = 0;
     std::cout<<"On the "<<i<<"th level of the search tree\n";
@@ -199,16 +199,16 @@ void backward_search_demo(const std::vector<std::vector<float>>& data){
     current_set.erase(feature_to_remove);
     std::cout<<"On level "<<i<<" I removed feature "<<feature_to_remove<<" with accuracy of "<<max_accuracy<<"\n\n";
     if(max_accuracy > best_accuracy){
-      accuracy_declining = false;
       best_accuracy = max_accuracy;
       max_set = current_set;
+      // accuracy_declining = false;
     }
-    else if(accuracy_declining){
-      break;
-    }
-    else{
-      accuracy_declining = true;
-    }
+    // else if(accuracy_declining){
+    //   break;
+    // }
+    // else{
+    //   accuracy_declining = true;
+    // }
   }
   std::cout<<"Best accuracy was on set {";
   for(auto it = max_set.begin(); it != max_set.end(); it++){
